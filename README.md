@@ -20,53 +20,8 @@ Download Link:
 [Baidu](https://pan.baidu.com/s/1qOqVu-6QWlunua2FCw-hRw) [Extracting code: a750]
 
 
-## Usage
+## Codes
 
-### Directory
-The directory should be like this:
-
-````
--- loss (loss function)
-
--- model (model structure)
-   |-- RMFormer.py
-
--- save_models (pretrained model)
-   |-- Atemp (save training process models)
-   |-- pretrain (pretrain swin model)
-   |   |-- swin_base_patch4_window12_384_22k.pth
-
--- train_data (train/test datasets, change in ./myconfig.py)
-   |-- HR10K
-   |   |-- image
-   |   |-- mask
-   |   |-- Results
-   |-- UHRSD
-   |   |-- image
-   |   |-- mask
-   |   |-- Results
-   ...
-   
-````
-
-
-
-### Train
-```
-python train.py
-```
-
-Download Swin pretrain model, save them in ./save_models/pretrain:
-
-[Swin-B-224](https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22k.pth)
-
-
-### Test
-The trained model can be download here: [Baidu]()
-
-```
-python test.py
-```
-* After testing, saliency maps will be saved in the '--pred_results_dir' in myconfig.py
+The code is being organized, and we will release it as soon as the organization is completed.
 
 
