@@ -60,7 +60,7 @@ python gen_edgemap.py
 
 Download Swin pretrain model, save them in ./save_models/pretrain:
 
-[Swin-B-224](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin ]
+[Swin-B-224](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin]
 
 Change the dataset paths in ./myconfig.py
 
@@ -74,7 +74,7 @@ python train.py
 
 
 ### Test
-Our trained model can be download here: [Google Drive]()
+Our trained model can be download here: [baidu](https://pan.baidu.com/s/196Wi4L5-nTUdP4ov8BLLTA) [Extracting code:w6ew]
 
 Change the paths in ./test.py, then run:
 ```
