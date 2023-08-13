@@ -85,4 +85,15 @@ python test.py
 ```
 * After testing, saliency maps will be saved in the `'prediction_dir'`
 
+### Evaluation
 
+The code in `./eval.py` is from:
+> https://github.com/xuebinqin/Binary-Segmentation-Evaluation-Tool
+
+
+We also use the evalutation below to generate results in our paper:
+
+> https://github.com/Jun-Pu/Evaluation-on-salient-object-detection
+
+
+We have add with some minor modifications to generate mBA results.
