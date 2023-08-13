@@ -1,12 +1,6 @@
-import shutil
-from model import IDEA2
-import torch
-import torch.nn.functional as F
 import numpy as np
 import os 
 import cv2 as cv2
-from PIL import Image
-from shutil import copyfile
 from tqdm import tqdm
 
 def edge_map_generate(m_dir, e_dir):
@@ -30,8 +24,8 @@ if __name__ == '__main__':
 
     # change to your own dir
 
-    mask_dir = 'train_data/MIX-DH/mask/'
-    edge_dir = 'train_data/MIX-DH/edge/'
+    mask_dir = 'train_data/MIX-KUH/KUH_train/mask/'
+    edge_dir = 'train_data/MIX-KUH/KUH_train/edge/'
 
     edge_map_generate(mask_dir, edge_dir)
 

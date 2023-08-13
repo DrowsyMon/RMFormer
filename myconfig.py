@@ -81,11 +81,11 @@ def training_param(parser):
     parser.add_argument('--warmup_epoch_num',type=int,default=16,help='warmup epochs')
     parser.add_argument('--train_scheduler_num',type=int,default=32,help='scheduler epochs')
     parser.add_argument('--epoch_num',type=int,default=32,help='Total epochs')
-    parser.add_argument('--batchsize',type=int,default=1,help='Batchsize')
-    parser.add_argument('--itr_epoch',type=int,default=2180,help='iterations per epoch/3735/1090/402/817/1635')
+    parser.add_argument('--batchsize',type=int,default=3,help='Batchsize')
+    parser.add_argument('--itr_epoch',type=int,default=4054,help='iterations per epoch/4980-KUH/2180-UH/4054-DH')
 
     parser.add_argument('--resume',action='store_true', default=False,help='Resume training,False')  
-    parser.add_argument('--eval',action='store_false', default=True,help='Evaluate')
+    parser.add_argument('--eval',action='store_false', default=False,help='Evaluate')
     parser.add_argument('--resume_path',type=str,\
         default='save_models/Atemp/epoch_4.pth',help='resume model path')
     parser.add_argument('--save_interval',type=int,default=1,help='save model every X epoch')
@@ -142,17 +142,20 @@ def transformer_setting(parser):
 
 def myParser():
     my_parser = argparse.ArgumentParser()
-    data_name = 'UH'
-    exp_name = 'expMM_UH_18_rebuttul_8'
+    data_name = 'DH'
+    exp_name = 'exptest_DH'
 
     tensorboard_folder = 'runs1'
     save_path = 'save_models/Atemp/'
 
     # setting==========================
+    # change dataset dir
     my_parser = setting_data(data_name, my_parser)
 
+    # change batchsize, training epoch, iteration num, etc.
     my_parser = training_param(my_parser)
 
+    # if using different backbone, change here
     my_parser = transformer_setting(my_parser)
 
     my_parser.add_argument('--model_dir',type=str,default=save_path,help='Save directory')
@@ -161,6 +164,9 @@ def myParser():
     args = my_parser.parse_args()
 
     return args
+
+
+
 
 if __name__ == "__main__":
     

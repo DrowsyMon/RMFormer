@@ -47,11 +47,11 @@ if __name__ == "__main__":
     ave1,maxF1,meamF1, mba1 = qual_eval(lbl_dir, results_dir)
 
     # # UHRSD
-    lbl_dir='train_data/UHRSD/UHRSD_TE_2K/mask/'
-    results_dir='train_data/UHRSD/Results/uhrsd_results/'
+    # lbl_dir='train_data/UHRSD/UHRSD_TE_2K/mask/'
+    # results_dir='train_data/UHRSD/Results/uhrsd_results/'
 
-    ave2,maxF2,meamF2, mba2 = qual_eval(lbl_dir, results_dir)
+    # ave2,maxF2,meamF2, mba2 = qual_eval(lbl_dir, results_dir)
 
     print('HR-SOD result:')
     print('hrsod  : aveMAE-> %.5f | maxF->%.5f | meanF->%.5f | mba->%.5f' %(ave1,maxF1,meamF1,mba1))
-    print('uhrsd  : aveMAE-> %.5f | maxF->%.5f | meanF->%.5f | mba->%.5f' %(ave2,maxF2,meamF2,mba2))
+    # print('uhrsd  : aveMAE-> %.5f | maxF->%.5f | meanF->%.5f | mba->%.5f' %(ave2,maxF2,meamF2,mba2))

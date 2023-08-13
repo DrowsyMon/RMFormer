@@ -56,7 +56,7 @@ def test_Net(model_list,image_dir, prediction_dir,args,flag_exp=1):
 	if flag_exp==1:
 		net = myNet1(args)
 
-	net.load_state_dict(torch.load(model_dir)['net'],strict= False)
+	net.load_state_dict(torch.load(model_dir)['net'],strict= True)
 	if torch.cuda.is_available():
 		net.cuda()
 	net.eval()
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 	args = myParser()
 
     # saved_model_dir
-	model_dir = 'save_models/Atemp2/epoch_31.pth'
+	model_dir = 'save_models/Atemp/bestone.pth'
 	# test img dir
 	image_dir = 'train_data/HRSOD/HRSOD_test/'
 	# results dir

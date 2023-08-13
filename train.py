@@ -11,8 +11,6 @@ import os
 from dataloader_collect import RandomFlip,RandomCrop,ToTensorLab,SalObjDataset,RescaleT
 from model import myNet1, LR_Scheduler
 from losses.lossfunc import loss_vit_simple_edgelist
-from net_test import test_Net
-from eval import qual_eval
 from model.helper.helper_blocks import setup_seed 
 from myconfig import myParser
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -78,15 +76,10 @@ if torch.cuda.is_available():
 
 print("---define optimizer...")
 optimizer = optim.SGD(
-                # [
-                #     {'params':net.lr_branch.parameters(), 'lr':args.init_lr*0.1},
-                #     {'params':net.refine.parameters()},
-                #     {'params':net.predictor.parameters()},  
-                #     {'params':net.hr_branch.parameters()},
-                # ],
                 [
                     {'params':net.lr_branch.parameters(), 'lr':args.init_lr*0.1},
-                    {'params':net.predictor.parameters()},  
+                    {'params':net.predictor.parameters()},
+
                     {'params':net.rrs1.patch_embed1.parameters()},
                     {'params':net.rrs1.in_conv.parameters()},
                     {'params':net.rrs1.stageconv.parameters()},
@@ -95,6 +88,7 @@ optimizer = optim.SGD(
                     {'params':net.rrs1.sideout.parameters()},
                     {'params':net.rrs1.sideout_e.parameters()},
                     {'params':net.rrs1.refiner.parameters()},
+
                     {'params':net.rrs2.patch_embed1.parameters()},
                     {'params':net.rrs2.in_conv.parameters()},
                     {'params':net.rrs2.stageconv.parameters()},
@@ -102,7 +96,7 @@ optimizer = optim.SGD(
                     {'params':net.rrs2.mid_conv.parameters()},
                     {'params':net.rrs2.sideout.parameters()},
                     {'params':net.rrs2.sideout_e.parameters()},
-                    {'params':net.rrs2.refiner.parameters()},
+                    # {'params':net.rrs2.refiner.parameters()},
                 ],
                 lr=args.init_lr,
                 momentum=0.9,
@@ -221,8 +215,8 @@ for epoch in range(start_epoch, args.epoch_num):
         writer.add_scalar('3_type/BEC',bceloss.item(), ((i+1)+epoch*args.itr_epoch))
         writer.add_scalar('3_type/IOUloss',iouloss.item(), ((i+1)+epoch*args.itr_epoch))
 
-        # if ((ite_num % (args.itr_epoch*args.save_interval))==0)|(ite_num == args.itr_epoch):
-        if (ite_num == 10):  
+        if ((ite_num % (args.itr_epoch*args.save_interval))==0)|(ite_num == args.itr_epoch):
+        # if (ite_num == 10):  
             checkpoint = {
                 "net": net.state_dict(),
                 'optimizer':optimizer.state_dict(),
@@ -233,37 +227,37 @@ for epoch in range(start_epoch, args.epoch_num):
         
             # eval at 1st epoch and >no_eval_interval
             # if args.eval == True & ((epoch == start_epoch) | (epoch > args.no_eval_interval)) :
-            if args.eval == True :
-                test_Net(save_dir,test_img_dir,pred_dir,args)
+            # if args.eval == True :
+            #     test_Net(save_dir,test_img_dir,pred_dir,args)
 
-                MAE, maxF, meanF, mba = qual_eval(test_label_dir,pred_dir)
-                # MAE, maxF, meanF = 0,0,0
-                writer.add_scalar('Eval/MAE',MAE, epoch)
-                writer.add_scalar('Eval/maxF',maxF, epoch)
-                writer.add_scalar('Eval/meanF',meanF, epoch)
-                writer.add_scalar('Eval/mba',meanF, mba)
+            #     MAE, maxF, meanF, mba = qual_eval(test_label_dir,pred_dir)
+            #     # MAE, maxF, meanF = 0,0,0
+            #     writer.add_scalar('Eval/MAE',MAE, epoch)
+            #     writer.add_scalar('Eval/maxF',maxF, epoch)
+            #     writer.add_scalar('Eval/meanF',meanF, epoch)
+            #     writer.add_scalar('Eval/mba',meanF, mba)
 
-                if epoch == start_epoch :
-                    best = maxF + meanF - MAE
-                    filename = (args.model_dir + "bestone.pth")
-                    torch.save(checkpoint, filename)
-                    b_epoch = epoch
-                    b_MAE = MAE
-                    b_maxF = maxF
-                    b_meanF = meanF
-                    b_mba = mba
-                elif (epoch > start_epoch) & (epoch > args.no_eval_interval):  # save model with best performance
-                    if maxF + meanF - MAE > best:
-                        best = maxF + meanF - MAE
-                        filename = (args.model_dir + "bestone.pth")
-                        torch.save(checkpoint, filename)
-                        b_epoch = epoch
-                        b_MAE = MAE
-                        b_maxF = maxF
-                        b_meanF = meanF
-                        b_mba = mba
+            #     if epoch == start_epoch :
+            #         best = maxF + meanF - MAE
+            #         filename = (args.model_dir + "bestone.pth")
+            #         torch.save(checkpoint, filename)
+            #         b_epoch = epoch
+            #         b_MAE = MAE
+            #         b_maxF = maxF
+            #         b_meanF = meanF
+            #         b_mba = mba
+            #     elif (epoch > start_epoch) & (epoch > args.no_eval_interval):  # save model with best performance
+            #         if maxF + meanF - MAE > best:
+            #             best = maxF + meanF - MAE
+            #             filename = (args.model_dir + "bestone.pth")
+            #             torch.save(checkpoint, filename)
+            #             b_epoch = epoch
+            #             b_MAE = MAE
+            #             b_maxF = maxF
+            #             b_meanF = meanF
+            #             b_mba = mba
 
-                print('b_epoch_%d_MAE_%3f_maxF_%3f_meanF_%mba%3f'%(b_epoch,b_MAE,b_maxF,b_mba))
+            #     print('b_epoch_%d_MAE_%3f_maxF_%3f_meanF_%mba%3f'%(b_epoch,b_MAE,b_maxF,b_mba))
            
             running_loss = 0.0
             running_tar_loss = 0.0

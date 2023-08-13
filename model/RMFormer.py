@@ -118,10 +118,15 @@ class RMF(nn.Module):
             self.load_from(config)
         self.predictor = MyDecoder(hrimg_size=384,tf_dim=128)
 
+        # PR
+        self.pr = PixelRefiner(cur_dim=16)
+
         # RRS
-        self.rrs1 = RRS(self.lr_branch,self.predictor, stage_res=768)
-        self.rrs2 = RRS(self.lr_branch,self.predictor, stage_res=1536)
+        self.rrs1 = RRS(self.lr_branch,self.predictor, self.pr, stage_res=768)
+        self.rrs2 = RRS(self.lr_branch,self.predictor, self.pr, stage_res=1536)
         
+
+
 
     def forward(self,x):
         lr_input = F.interpolate(x, self.lr_res, mode='bilinear', align_corners=True)
@@ -134,12 +139,14 @@ class RMF(nn.Module):
 
 
         pred_c,lr_f, pred_e, proto = self.predictor(lr_emb_list, '0')
-        out_pred_list.append(pred_c)
+        # out_pred_list.append(pred_c)
+        out_edge_list.append(pred_e)
 
         pred_mid, edge_mid, attn_list = self.rrs1(pred_c, x)
         out_pred_list += pred_mid
         out_edge_list += edge_mid
         out_attn_list += attn_list
+
         pred_mid, edge_mid, attn_list = self.rrs2(pred_mid[-1], x)
         out_pred_list += pred_mid
         out_edge_list += edge_mid
@@ -148,6 +155,13 @@ class RMF(nn.Module):
         pred_final = out_pred_list[-1]
         if not self.training:
             pred_final = torch.sigmoid(pred_final)
+
+
+        # i = 0
+        # for p_temp in out_pred_list:
+        #     save_output_cv2(torch.sigmoid(p_temp), str(i))
+        #     i += 1
+
 
         return pred_final,pred_c, out_pred_list, out_edge_list, out_attn_list
 
@@ -311,10 +325,16 @@ class MyDecoder(nn.Module):
 
 
 class RRS(nn.Module):
-    def __init__(self ,lrswinnet,decoder, stage_res = 1024):
+    def __init__(self ,lrswinnet,decoder, prrefine, stage_res = 1024):
         super(RRS, self).__init__()
 
         self.stage_res = stage_res
+
+        if stage_res == 768:
+            self.cps_num = '1'
+        elif stage_res == 1536:
+            self.cps_num = '2'
+
         self.down_num = int((self.stage_res / 384)//2)
         self.patchsize2 = 4
         self.tf_dim2 = 128
@@ -335,10 +355,12 @@ class RRS(nn.Module):
             ConvBlock(16+3, 16) for _ in range(self.down_num)
         )
 
+        self.mid_conv = ConvBlock(16+2, 16)
+
         self.deconv = nn.ModuleList(
             ConvBlock(16+3, 16) for _ in range(self.down_num)
         )     
-        self.mid_conv = ConvBlock(16+2, 16)
+
 
         self.sideout = nn.ModuleList(
             nn.Conv2d(16,1,kernel_size=1,bias=False) for _ in range(self.down_num+1)
@@ -352,7 +374,8 @@ class RRS(nn.Module):
         self.down = nn.MaxPool2d(2)
         self.up = nn.UpsamplingBilinear2d(scale_factor=2)
 
-        self.refiner = PixelRefiner(cur_dim=16)
+        # self.refiner = PixelRefiner(cur_dim=16)
+        self.refiner = prrefine
 
 
 
@@ -390,7 +413,7 @@ class RRS(nn.Module):
                 tempx,x_ori = self.swinlayers.layers[i_layer](tempx)
                 x_down_1.append(x_ori)
 
-        pred_mid, f_up, edge_mid, proto = self.seghead([tempx, x_down_1], '1')
+        pred_mid, f_up, edge_mid, proto = self.seghead([tempx, x_down_1], self.cps_num)
 
 
 
@@ -403,9 +426,9 @@ class RRS(nn.Module):
         pred_list.append(pred_mid)
         edge_list.append(edge_mid)
 
-        for j in range(self.down_num):
+        for j in range(self.down_num+1):
             cur_res = f_up.shape[-1]
-            pred_in_t = F.interpolate(pred_list[-1],cur_res,mode='bilinear',align_corners=False)
+            pred_in_t = F.interpolate(pred_in,cur_res,mode='bilinear',align_corners=False)
             edge_in_t = F.interpolate(torch.sigmoid(edge_list[-1]),cur_res,mode='bilinear',align_corners=False)
 
             if cur_res in self.pr_stage:
@@ -419,13 +442,13 @@ class RRS(nn.Module):
             f_up = self.up(f_up)
 
 
-        pred_in_t = F.interpolate(pred_list[-1],f_up.shape[-1],mode='bilinear',align_corners=False)
-        edge_in_t = F.interpolate(torch.sigmoid(edge_list[-1]),f_up.shape[-1],mode='bilinear',align_corners=False)
-        pred_refine, attnout1 = self.refiner(en_feats[0], en_feats[-1], f_up, pred_in_t,edge_in_t, proto)
-        attn_list.append(attnout1)
-        f_up = self.deconv[0](torch.cat([f_up+en_feats[0], pred_in_t,edge_in_t, pred_refine], 1))
-        pred_list.append(self.sideout[0](f_up))
-        edge_list.append(self.sideout[0](f_up))
+        # pred_in_t = F.interpolate(pred_in,f_up.shape[-1],mode='bilinear',align_corners=False)
+        # edge_in_t = F.interpolate(torch.sigmoid(edge_list[-1]),f_up.shape[-1],mode='bilinear',align_corners=False)
+        # pred_refine, attnout1 = self.refiner(en_feats[0], en_feats[-1], f_up, pred_in_t,edge_in_t, proto)
+        # attn_list.append(attnout1)
+        # f_up = self.deconv[0](torch.cat([f_up+en_feats[0], pred_in_t,edge_in_t, pred_refine], 1))
+        # pred_list.append(self.sideout[0](f_up))
+        # edge_list.append(self.sideout_e[0](f_up))
 
         # pred_list = [pred_1_mid,pred_2_mid,pred_1_mid2,pred_2_mid2,pred_2_mid3,pred_1, pred_2]
         # edge_list = [pred_1_mid2_e, pred_1_e, pred_2_mid2_e, pred_2_mid3_e,pred_2_e, edge_1_mid,edge_2_mid]

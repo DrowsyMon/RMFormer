@@ -50,7 +50,7 @@ The directory should be like this:
 ````
 
 ### Edge map generate
-Modify the dir in ./gen_edgemap.py, then run:
+Modify the dir in `./gen_edgemap.py`, then run:
 ```
 python gen_edgemap.py
 ```
@@ -58,29 +58,31 @@ python gen_edgemap.py
 ### Train
 
 
-Download Swin pretrain model, save them in ./save_models/pretrain:
+Download Swin pretrain model, save them in `./save_models/pretrain`:
 
 [Swin-B-224](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin]
 
-Change the dataset paths in ./myconfig.py
+Change the dataset directory, training setting in `./myconfig.py`
 
-run:
+then run:
 
 ```
-python train.py
+bash train.sh
 ```
 
-* After training, models will be saved in ./save_models/Atemp
+* After training, models will be saved in `./save_models/Atemp`
+* Tensorboard log files are in `./runs1`
 
 
-### Test
-Our trained model can be download here: [baidu](https://pan.baidu.com/s/196Wi4L5-nTUdP4ov8BLLTA) [Extracting code:w6ew]
+### Interference
+We trained model in three different training setting: DH, UH and KUH 
 
-Change the paths in ./test.py, then run:
+These trained models be download here: [Baidu](https://pan.baidu.com/s/1IAkMLPxEw_27wGWYLnNNhA) [Extracting code:3xsr]
+
+Change the paths in `./test.py`, then run:
 ```
 python test.py
 ```
-* After testing, saliency maps will be saved in the '--pred_results_dir' in myconfig.py
+* After testing, saliency maps will be saved in the `'prediction_dir'`
 
 
-123123testtest

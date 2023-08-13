@@ -33,11 +33,6 @@ class RescaleT(object):
 		new_h, new_w = int(new_h), int(new_w)
 
 		# #resize the image to new_h x new_w and convert image from range [0,255] to [0,1]
-		# img = transform.resize(image,(new_h,new_w),mode='constant')
-		# lbl = transform.resize(label,(new_h,new_w),mode='constant', order=0, preserve_range=True)
-
-		# img = transform.resize(image,(self.output_size,self.output_size),mode='constant')
-		# lbl = transform.resize(label,(self.output_size,self.output_size),mode='constant', order=0, preserve_range=True)
 		img = cv2.resize(image,(self.output_size,self.output_size))
 		lbl = cv2.resize(label,(self.output_size,self.output_size))
 		edg = cv2.resize(edge,(self.output_size,self.output_size))
@@ -127,17 +122,6 @@ class RandomCrop(object):
 			label = cv2.resize(label,self.output_size)
 			edge = cv2.resize(edge,self.output_size)
 		return {'image': image, 'label': label, 'edge':edge}
-		# H,W,_   = image.shape
-		# randw   = np.random.randint(W/8)
-		# randh   = np.random.randint(H/8)
-		# offseth = 0 if randh == 0 else np.random.randint(randh)
-		# offsetw = 0 if randw == 0 else np.random.randint(randw)
-		# p0, p1, p2, p3 = offseth, H+offseth-randh, offsetw, W+offsetw-randw
-		# return {'image': image[p0:p1,p2:p3, :], 'label': label[p0:p1,p2:p3], 'edge':edge[p0:p1,p2:p3]}
-
-
-
-
 
 class RandomFlip(object):
 	def __init__(self, p):
@@ -310,9 +294,6 @@ class ToTensorLab(object):
 
 class SalObjDataset(Dataset):
 	def __init__(self,img_name_list,lbl_name_list,edge_name_list,transform=None):
-		# self.root_dir = root_dir
-		# self.image_name_list = glob.glob(image_dir+'*.png')
-		# self.label_name_list = glob.glob(label_dir+'*.png')
 		self.image_name_list = img_name_list
 		self.label_name_list = lbl_name_list
 		self.edge_name_list = edge_name_list
@@ -334,10 +315,6 @@ class SalObjDataset(Dataset):
 			label_3 = cv2.imread(self.label_name_list[idx])
 			edge_3 = cv2.imread(self.edge_name_list[idx])
 
-		#print("len of label3")
-		#print(len(label_3.shape))
-		#print(label_3.shape)
-
 		label = np.zeros(label_3.shape[0:2])
 		edge = np.zeros(edge_3.shape[0:2])
 		if(3==len(label_3.shape)):
@@ -358,15 +335,6 @@ class SalObjDataset(Dataset):
 		elif(2==len(image.shape) and 2==len(label.shape)):
 			image = image[:,:,np.newaxis]
 			label = label[:,:,np.newaxis] #np.newaxis 增加一维
-
-		# #vertical flipping
-		# # fliph = np.random.randn(1)
-		# flipv = np.random.randn(1)
-		#
-		# if flipv>0:
-		# 	image = image[::-1,:,:]
-		# 	label = label[::-1,:,:]
-		# #vertical flip
 
 		sample = {'image':image, 'label':label, 'edge':edge,'original_shape':original_shape}
 
