@@ -3,12 +3,7 @@
 
 This Repo. is used for our ACM MM2023 paper: 
 
-
-<!-- <p align="center">
-  <img src="" width="85%">
-</p> -->
-
-> Recurrent Multi-scale Transformer for High-Resolution Salient Object Detection, ACM MM2023  
+> Recurrent Multi-scale Transformer for High-Resolution Salient Object Detection, ACM MM2023 (https://arxiv.org/abs/2308.03826)
 
 ## HR10K Dataset
 
@@ -97,3 +92,11 @@ We also use the evalutation below to generate results in our paper:
 
 
 We have add with some minor modifications to generate mBA results.
+
+
+---
+---
+
+If you have any problems. Please concat
+
+zhpp@dlut.edu.cn or dengxh@mail.dlut.edu.cn
