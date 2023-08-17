@@ -14,6 +14,7 @@ Download Link:
 
 [Baidu](https://pan.baidu.com/s/1qOqVu-6QWlunua2FCw-hRw) [Extracting code: a750]
 
+[Google Drive](https://drive.google.com/drive/folders/1LpCkuTX2Efy2tKak3qVz_Uma2-6DEmaN?usp=sharing)
 
 ## Usage
 
@@ -81,6 +82,10 @@ python test.py
 * After testing, saliency maps will be saved in the `'prediction_dir'`
 
 ### Evaluation
+The saliency maps of our RMFormer can be download here:
+
+[Baidu](https://pan.baidu.com/s/1BVj_BaaFX4vz7PlbSDFqcw) [Extracting code:4h2g]
+
 
 The code in `./eval.py` is from:
 > https://github.com/xuebinqin/Binary-Segmentation-Evaluation-Tool
@@ -91,7 +96,7 @@ We also use the evalutation below to generate results in our paper:
 > https://github.com/Jun-Pu/Evaluation-on-salient-object-detection
 
 
-We have add with some minor modifications to generate mBA results.
+We have added some modifications to these codes above for generating mBA results.
 
 
 ---
