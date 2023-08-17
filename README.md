@@ -73,7 +73,10 @@ bash train.sh
 ### Interference
 We trained model in three different training setting: DH, UH and KUH 
 
-These trained models be download here: [Baidu](https://pan.baidu.com/s/1IAkMLPxEw_27wGWYLnNNhA) [Extracting code:3xsr]
+These trained models be download here: 
+
+[Baidu](https://pan.baidu.com/s/1h5hEpEdTHRpXp-QT-ys4dg) [Extracting code:iavg]
+
 
 Change the paths in `./test.py`, then run:
 ```
