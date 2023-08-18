@@ -45,7 +45,6 @@ conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit
 # Others
 conda install tqdm tensorboard tensorboardX
 pip install opencv-python einops timm scikit-image
-
 ```
 
 
@@ -78,7 +77,6 @@ The directory should be like this:
    |-- HRSOD
    |   |-- image
    ...
-   
 ````
 
 ### Edge Map Generate
