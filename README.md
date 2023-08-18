@@ -17,7 +17,7 @@ Download Link:
 >[Google Drive](https://drive.google.com/drive/folders/1LpCkuTX2Efy2tKak3qVz_Uma2-6DEmaN?usp=sharing)
 
 ## Usage
-### CondaEnviorment
+### Conda Enviorment
 For our experiment settings: 
 ```
 # Create New Enviorment
