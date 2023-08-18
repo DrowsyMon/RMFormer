@@ -1,8 +1,6 @@
 import numpy as np
 from skimage import io
 import glob
-from measures import compute_ave_MAE_of_methods
-from measures import compute_PRE_REC_FM_of_methods,plot_save_pr_curves,plot_save_fm_curves
 from measures import compute_MAE_F_S_cv2
 
 def qual_eval(lbl_dir='./lbl/',results_dir='./test/res/'):

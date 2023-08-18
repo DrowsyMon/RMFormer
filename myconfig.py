@@ -82,17 +82,12 @@ def training_param(parser):
     parser.add_argument('--train_scheduler_num',type=int,default=32,help='scheduler epochs')
     parser.add_argument('--epoch_num',type=int,default=32,help='Total epochs')
     parser.add_argument('--batchsize',type=int,default=3,help='Batchsize')
-    parser.add_argument('--itr_epoch',type=int,default=4054,help='iterations per epoch/4980-KUH/2180-UH/4054-DH')
+    parser.add_argument('--itr_epoch',type=int,default=4054,help='iterations per epoch/4980-KUH/2180-UH/4054-DH/536-HRSOD/2800-HR10K')
 
     parser.add_argument('--resume',action='store_true', default=False,help='Resume training,False')  
-    parser.add_argument('--eval',action='store_false', default=False,help='Evaluate')
     parser.add_argument('--resume_path',type=str,\
         default='save_models/Atemp/epoch_4.pth',help='resume model path')
     parser.add_argument('--save_interval',type=int,default=1,help='save model every X epoch')
-    parser.add_argument('--no_eval_interval',type=int,default=0,help='save model every X epoch')
-
-    parser.add_argument('--use_swinU', type=bool,
-                        default=True, help='if model has swin transformer')
 
     return parser
 

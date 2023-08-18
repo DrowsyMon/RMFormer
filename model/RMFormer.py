@@ -28,7 +28,7 @@ def weight_init_my(module):
             nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, (nn.ReLU,nn.AdaptiveAvgPool2d,nn.AdaptiveAvgPool1d,nn.AdaptiveMaxPool1d,\
             nn.Softmax,  nn.Identity, Mlp, nn.PixelShuffle,nn.PixelUnshuffle, nn.MaxPool2d,nn.Dropout,nn.GELU,\
-            nn.Sigmoid,MultiKMeans,nn.AvgPool2d,nn.UpsamplingBilinear2d,nn.MSELoss,
+            nn.Sigmoid,nn.AvgPool2d,nn.UpsamplingBilinear2d,nn.MSELoss,
             nn.InstanceNorm2d, nn.MultiheadAttention)):
             pass
         else:

@@ -17,6 +17,24 @@ Download Link:
 >[Google Drive](https://drive.google.com/drive/folders/1LpCkuTX2Efy2tKak3qVz_Uma2-6DEmaN?usp=sharing)
 
 ## Usage
+### CondaEnviorment
+For our experiment settings: 
+```
+# Create New Enviorment
+conda create -n RMFormer python=3.8
+
+# CUDA & PyTorch
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge
+
+# Others
+conda install tqdm tensorboard tensorboardX
+pip install opencv-python einops timm scikit-image
+
+```
+
+
+
+
 
 ### Directory
 The directory should be like this:
@@ -59,6 +77,8 @@ Download Swin pretrain model, save them in `./save_models/pretrain`:
 >[Swin-B-224](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin]
 
 Change the dataset directory, training setting in `./myconfig.py`
+
+Make sure `--itr_epoch` in `training_param` is set correctly
 
 then run:
 

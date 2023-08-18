@@ -3,7 +3,7 @@ import numpy as np
 from skimage import io
 import cv2
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 def mask_normalize(mask):
 # input 'mask': HxW
@@ -161,80 +161,6 @@ def compute_PRE_REC_FM_of_methods(gt_name_list,rs_dir_lists,beta=0.3):
 
     return PRE, REC, FM, gt2rs
 
-
-
-def plot_save_pr_curves(PRE, REC, method_names, lineSylClr, linewidth, xrange=(0.0,1.0), yrange=(0.0,1.0), dataset_name = 'TEST', save_dir = './', save_fmt = 'pdf'):
-
-    fig1 = plt.figure(1)
-    num = PRE.shape[0]
-    for i in range(0,num):
-        if (len(np.array(PRE[i]).shape)!=0):
-            plt.plot(REC[i], PRE[i],lineSylClr[i],linewidth=linewidth[i],label=method_names[i])
-
-    plt.xlim(xrange[0],xrange[1])
-    plt.ylim(yrange[0],yrange[1])
-
-    xyrange1 = np.arange(xrange[0],xrange[1]+0.01,0.1)
-    xyrange2 = np.arange(yrange[0],yrange[1]+0.01,0.1)
-
-    plt.tick_params(direction='in')
-    plt.xticks(xyrange1,fontsize=15,fontname='serif')
-    plt.yticks(xyrange2,fontsize=15,fontname='serif')
-
-    ## draw dataset name
-    plt.text((xrange[0]+xrange[1])/2.0,yrange[0]+0.02,dataset_name,horizontalalignment='center',fontsize=20, fontname='serif',fontweight='bold')
-
-    plt.xlabel('Recall',fontsize=20,fontname='serif')
-    plt.ylabel('Precision',fontsize=20,fontname='serif')
-
-    font1 = {'family': 'serif',
-    'weight': 'normal',
-    'size': 7,
-    }
-
-    handles, labels = plt.gca().get_legend_handles_labels()
-    order = [len(handles)-x for x in range(1,len(handles)+1)]
-    plt.legend([handles[idx] for idx in order], [labels[idx] for idx in order],loc='lower left', prop=font1)
-    plt.grid(linestyle='--')
-    fig1.savefig(save_dir+dataset_name+"_pr_curves."+save_fmt,bbox_inches='tight',dpi=300)
-    print('>>PR-curves saved: %s'%(save_dir+dataset_name+"_pr_curves."+save_fmt))
-
-
-def plot_save_fm_curves(FM, mybins, method_names, lineSylClr, linewidth, xrange=(0.0,1.0), yrange=(0.0,1.0), dataset_name = 'TEST', save_dir = './', save_fmt = 'pdf'):
-
-    fig2 = plt.figure(2)
-    num = FM.shape[0]
-    for i in range(0,num):
-        if (len(np.array(FM[i]).shape)!=0):
-            plt.plot(np.array(mybins[0:-1]).astype(np.float)/255.0, FM[i],lineSylClr[i],linewidth=linewidth[i],label=method_names[i])
-
-    plt.xlim(xrange[0],xrange[1])
-    plt.ylim(yrange[0],yrange[1])
-
-    xyrange1 = np.arange(xrange[0],xrange[1]+0.01,0.1)
-    xyrange2 = np.arange(yrange[0],yrange[1]+0.01,0.1)
-
-    plt.tick_params(direction='in')
-    plt.xticks(xyrange1,fontsize=15,fontname='serif')
-    plt.yticks(xyrange2,fontsize=15,fontname='serif')
-
-    ## draw dataset name
-    plt.text((xrange[0]+xrange[1])/2.0,yrange[0]+0.02,dataset_name,horizontalalignment='center',fontsize=20, fontname='serif',fontweight='bold')
-
-    plt.xlabel('Thresholds',fontsize=20,fontname='serif')
-    plt.ylabel('F-measure',fontsize=20,fontname='serif')
-
-    font1 = {'family': 'serif',
-    'weight': 'normal',
-    'size': 7,
-    }
-
-    handles, labels = plt.gca().get_legend_handles_labels()
-    order = [len(handles)-x for x in range(1,len(handles)+1)]
-    plt.legend([handles[idx] for idx in order], [labels[idx] for idx in order],loc='lower left', prop=font1)
-    plt.grid(linestyle='--')
-    fig2.savefig(save_dir+dataset_name+"_fm_curves."+save_fmt,bbox_inches='tight',dpi=300)
-    print('>>F-measure curves saved: %s'%(save_dir+dataset_name+"_fm_curves."+save_fmt))
 
 def compute_MAE_F_S(gt_name_list,rs_dir_lists,beta=0.3):
     mybins = np.arange(0,256) # different thresholds to achieve binarized masks for pre, rec, Fm measures
