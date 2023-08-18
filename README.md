@@ -7,6 +7,10 @@ This Repo. is used for our ACM MM2023 paper:
 
 ## HR10K Dataset
 
+![Image](https://github.com/DrowsyMon/RMFormer/blob/main/pic/10k_1.png)
+
+![Image](https://github.com/DrowsyMon/RMFormer/blob/main/pic/10k_2.png)
+
 We contribute a new HRSOD dataset named HR10K, which contains a total of 10,500 images, dividing 8,400 images for training and 2,100 images for testing.
 
 Download Link:
