@@ -63,7 +63,7 @@ The directory should be like this:
    
 ````
 
-### Edge map generate
+### Edge Map Generate
 Modify the dir in `./gen_edgemap.py`, then run:
 ```
 python gen_edgemap.py
@@ -121,7 +121,7 @@ We also use the evalutation below to generate results in our paper:
 > https://github.com/Jun-Pu/Evaluation-on-salient-object-detection
 
 
-We have added some modifications to these codes above for generating mBA results.
+We have added some modifications in our codes for generating mBA results.
 
 
 ---
