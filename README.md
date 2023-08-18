@@ -63,6 +63,8 @@ The directory should be like this:
    |   |-- image
    |   |-- mask
    |   |-- Results
+   |-- HRSOD
+   |   |-- image
    ...
    
 ````
