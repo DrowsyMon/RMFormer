@@ -5,13 +5,13 @@ This Repo. is used for our ACM MM2023 paper:
 
 > Recurrent Multi-scale Transformer for High-Resolution Salient Object Detection, ACM MM2023 (https://arxiv.org/abs/2308.03826)
 
-## HR10K Dataset
+## HRS10K Dataset
 
 ![Image](https://github.com/DrowsyMon/RMFormer/blob/main/pic/10k_1.png)
 
 ![Image](https://github.com/DrowsyMon/RMFormer/blob/main/pic/10k_2.png)
 
-We contribute a new HRSOD dataset named HR10K, which contains a total of 10,500 images, dividing 8,400 images for training and 2,100 images for testing.
+We contribute a new HRSOD dataset named HRS10K, which contains a total of 10,500 images, dividing 8,400 images for training and 2,100 images for testing.
 
 Download Link:
 
@@ -55,7 +55,7 @@ The directory should be like this:
    |   |-- swin_base_patch4_window12_384_22k.pth
 
 -- train_data (train/test datasets, change in ./myconfig.py)
-   |-- HR10K
+   |-- HRS10K
    |   |-- image
    |   |-- mask
    |   |-- Results
