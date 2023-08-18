@@ -22,7 +22,19 @@ Download Link:
 
 ## Usage
 ### Conda Enviorment
-For our experiment settings: 
+* PyTorch 1.21.1
+* python 3.8
+* cudatoolkit 11.6
+* OpenCV
+* einops
+* timm
+* skimage
+* tqdm
+* tenosorboard
+
+
+
+You can initialize a new conda enviroment as follow: 
 ```
 # Create New Enviorment
 conda create -n RMFormer python=3.8
