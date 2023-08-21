@@ -42,7 +42,7 @@ def test_Net(model_list,image_dir, prediction_dir,args,flag_exp=1):
 	model_dir = model_list
 	print('interferce test img at: ' + image_dir)
 	print('prediction saved at: ' + prediction_dir)
-	img_name_list = glob.glob(image_dir + '*.jpg')
+	img_name_list = glob.glob(image_dir + '*.jpg') + glob.glob(image_dir + '*.png')
 
 	
 	# --------- 2. dataloader ---------
