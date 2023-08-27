@@ -4,35 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .helper.helper_blocks import *
 from .helper.custom_trans_v1 import Swin, PatchEmbed_My, Mlp
-
 import cv2
 import os
-def weight_init_my(module):
-    for n, m in module.named_children():
-        if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-            nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
-            if m.bias is not None:
-                nn.init.zeros_(m.bias)
-        elif isinstance(m, (nn.BatchNorm2d, nn.BatchNorm1d)):
-            nn.init.ones_(m.weight)
-            if m.bias is not None:
-                nn.init.zeros_(m.bias)
-        elif isinstance(m, nn.Linear):
-            nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
-            if m.bias is not None:
-                nn.init.zeros_(m.bias)
-        elif isinstance(m, (nn.Sequential, nn.ModuleList)):
-            weight_init_my(m)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-        elif isinstance(m, (nn.ReLU,nn.AdaptiveAvgPool2d,nn.AdaptiveAvgPool1d,nn.AdaptiveMaxPool1d,\
-            nn.Softmax,  nn.Identity, Mlp, nn.PixelShuffle,nn.PixelUnshuffle, nn.MaxPool2d,nn.Dropout,nn.GELU,\
-            nn.Sigmoid,nn.AvgPool2d,nn.UpsamplingBilinear2d,nn.MSELoss,
-            nn.InstanceNorm2d, nn.MultiheadAttention)):
-            pass
-        else:
-            m.initialize()
 
 def save_output_cv2(pred_in,num_name):
     pred = pred_in[:,0,:,:].detach()
@@ -129,7 +102,7 @@ class RMF(nn.Module):
 
 
     def forward(self,x):
-        lr_input = F.interpolate(x, self.lr_res, mode='bilinear', align_corners=True)
+        lr_input = F.interpolate(x, self.lr_res, mode='bilinear', align_corners=False)
         lr_emb_list = self.lr_branch(lr_input)
 
 
@@ -139,7 +112,6 @@ class RMF(nn.Module):
 
 
         pred_c,lr_f, pred_e, proto = self.predictor(lr_emb_list, '0')
-        # out_pred_list.append(pred_c)
         out_edge_list.append(pred_e)
 
         pred_mid, edge_mid, attn_list = self.rrs1(pred_c, x)
@@ -155,13 +127,6 @@ class RMF(nn.Module):
         pred_final = out_pred_list[-1]
         if not self.training:
             pred_final = torch.sigmoid(pred_final)
-
-
-        # i = 0
-        # for p_temp in out_pred_list:
-        #     save_output_cv2(torch.sigmoid(p_temp), str(i))
-        #     i += 1
-
 
         return pred_final,pred_c, out_pred_list, out_edge_list, out_attn_list
 
@@ -212,8 +177,10 @@ class decode_MLP(nn.Module):
         super().__init__()
         self.proj = nn.Linear(input_dim, embed_dim)
 
+        self.initialize()
+        
+
     def forward(self, x):
-        # x = x.flatten(2).transpose(1, 2)
         B_,N_,_ = x.shape
         res = int(np.sqrt(N_))
         x = self.proj(x)
@@ -221,6 +188,8 @@ class decode_MLP(nn.Module):
         x = x.view(B_,res,res,-1).permute(0,3,1,2)
         return x
 
+    def initialize(self):
+        weight_init_my(self)
 
 class MyDecoder(nn.Module):
     def __init__(self ,hrimg_size = 1024, tf_dim = 128):
@@ -266,6 +235,7 @@ class MyDecoder(nn.Module):
         self.conv_shrink_2 = ConvBlock(self.tf_dim2*4, self.tf_dim2*1,1,0)
         self.conv_shrink_3 = ConvBlock(self.tf_dim2*4, self.tf_dim2*1,1,0)
 
+        self.initialize()
 
 
 
@@ -343,7 +313,7 @@ class RRS(nn.Module):
 
         self.pr_stage = [768, 1536]
 
-        self.swinlayers = lrswinnet
+
 
         self.patch_embed1 = PatchEmbed_My(
             img_size=384, patch_size=4, in_chans=16+3, embed_dim=self.emb_dim,
@@ -372,9 +342,11 @@ class RRS(nn.Module):
         self.seghead = decoder
 
         self.down = nn.MaxPool2d(2)
-        self.up = nn.UpsamplingBilinear2d(scale_factor=2)
+        self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
 
-        # self.refiner = PixelRefiner(cur_dim=16)
+        self.initialize()
+
+        self.swinlayers = lrswinnet
         self.refiner = prrefine
 
 
@@ -406,12 +378,9 @@ class RRS(nn.Module):
         tempx = self.patch_embed1(x_in)
 
         for i_layer in range(len(self.swinlayers.layers)):
-            if i_layer==2:
-                tempx,x_ori = self.swinlayers.layers[i_layer](tempx, use_num=20)
-                x_down_1.append(x_ori)
-            else:
-                tempx,x_ori = self.swinlayers.layers[i_layer](tempx)
-                x_down_1.append(x_ori)
+
+            tempx,x_ori = self.swinlayers.layers[i_layer](tempx)
+            x_down_1.append(x_ori)
 
         pred_mid, f_up, edge_mid, proto = self.seghead([tempx, x_down_1], self.cps_num)
 
@@ -441,23 +410,10 @@ class RRS(nn.Module):
             edge_list.append(self.sideout_e[-1-j](f_up))
             f_up = self.up(f_up)
 
-
-        # pred_in_t = F.interpolate(pred_in,f_up.shape[-1],mode='bilinear',align_corners=False)
-        # edge_in_t = F.interpolate(torch.sigmoid(edge_list[-1]),f_up.shape[-1],mode='bilinear',align_corners=False)
-        # pred_refine, attnout1 = self.refiner(en_feats[0], en_feats[-1], f_up, pred_in_t,edge_in_t, proto)
-        # attn_list.append(attnout1)
-        # f_up = self.deconv[0](torch.cat([f_up+en_feats[0], pred_in_t,edge_in_t, pred_refine], 1))
-        # pred_list.append(self.sideout[0](f_up))
-        # edge_list.append(self.sideout_e[0](f_up))
-
-        # pred_list = [pred_1_mid,pred_2_mid,pred_1_mid2,pred_2_mid2,pred_2_mid3,pred_1, pred_2]
-        # edge_list = [pred_1_mid2_e, pred_1_e, pred_2_mid2_e, pred_2_mid3_e,pred_2_e, edge_1_mid,edge_2_mid]
-        # attn_list = [attnout1, attnout2_1, attnout2_2]
-        # pred_final = pred_list[-1]
-
         return pred_list, edge_list, attn_list
 
-
+    def initialize(self):
+        weight_init_my(self)
 
 
 class PixelRefiner(nn.Module):
@@ -526,7 +482,6 @@ class PixelRefiner(nn.Module):
         else:
             s_factor = 20
 
-
         select_conv,select_de, idx_group = self.patch_gen_select(edge_map, cur_hr_conv, cur_de, select_factor=s_factor)
 
         conv_en_select = self.cross_enhance(select_conv, conv_lr_flatten, conv_sam_flatten, shortcut=select_de)
@@ -538,22 +493,7 @@ class PixelRefiner(nn.Module):
         attn_p = torch.sigmoid(attn_out)
 
         pred_en = self.patch_reverse(conv_en_select, attn_p,cur_de, pred_map, idx_group)
-
-
-
-        # out_de = conv_en.view(B, cur_size, cur_size, -1).permute(0,3,1,2)
         pred_de = pred_en.view(B, cur_size, cur_size, -1).permute(0,3,1,2)
-        # edge_de = edge_en.view(B, cur_size, cur_size, -1).permute(0,3,1,2)
-
-
-        # # # visualization--------------------
-        # position_map = torch.zeros_like(cur_de[:,:,0].unsqueeze(-1)).cuda()
-        # position_map = position_map.scatter(1, idx_group[0], 1)
-        # save_output_cv2(position_map.view(B, cur_size, cur_size, -1).permute(0,3,1,2), 0)
-        # showimg = torch.zeros_like(cur_de[:,:,0].unsqueeze(-1)).cuda()
-        # showimg = showimg.scatter(1, idx_group[0], torch.sigmoid(edge_out))
-        # save_output_cv2(showimg.view(B, cur_size, cur_size, -1).permute(0,3,1,2), 1)
-
 
         return pred_de, attn_out_list
 

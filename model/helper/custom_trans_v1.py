@@ -5,6 +5,26 @@ from einops import rearrange
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 import numpy as np
 
+def weight_init_my(module):
+    for n, m in module.named_children():
+        if isinstance(m, (nn.BatchNorm2d, nn.BatchNorm1d)):
+            nn.init.ones_(m.weight)
+            if m.bias is not None:
+                nn.init.zeros_(m.bias)
+        elif isinstance(m, (nn.Sequential, nn.ModuleList)):
+            weight_init_my(m)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, (nn.ReLU,nn.AdaptiveAvgPool2d,nn.AdaptiveAvgPool1d,nn.AdaptiveMaxPool1d,\
+            nn.Softmax,  nn.Identity, Mlp, nn.PixelShuffle,nn.PixelUnshuffle, nn.MaxPool2d,nn.Dropout,nn.GELU,\
+            nn.Sigmoid,nn.AvgPool2d,nn.Upsample,nn.MSELoss, nn.Linear, nn.Conv2d, nn.ConvTranspose2d,
+            nn.InstanceNorm2d, nn.MultiheadAttention)):
+            pass
+        else:
+            m.initialize()
+
+
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
         super().__init__()
@@ -39,6 +59,8 @@ class PatchEmbed_My(nn.Module):
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
         self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
 
+        self.initialize()
+
     def forward(self, x):
         B, C, H, W = x.shape
         # assert(H == self.img_size[0], f"Input image height ({H}) doesn't match model ({self.img_size[0]}).")
@@ -48,6 +70,9 @@ class PatchEmbed_My(nn.Module):
             x = x.flatten(2).transpose(1, 2)  # BCHW -> BNC
         x = self.norm(x)
         return x
+    
+    def initialize(self):
+        weight_init_my(self)
 
 
 
@@ -244,31 +269,6 @@ class SwinTransformerBlock(nn.Module):
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
-
-        # if self.shift_size > 0:
-        #     # calculate attention mask for SW-MSA
-        #     H, W = self.input_resolution
-        #     img_mask = torch.zeros((1, H, W, 1))  # 1 H W 1
-        #     h_slices = (slice(0, -self.window_size),
-        #                 slice(-self.window_size, -self.shift_size),
-        #                 slice(-self.shift_size, None))
-        #     w_slices = (slice(0, -self.window_size),
-        #                 slice(-self.window_size, -self.shift_size),
-        #                 slice(-self.shift_size, None))
-        #     cnt = 0
-        #     for h in h_slices:
-        #         for w in w_slices:
-        #             img_mask[:, h, w, :] = cnt
-        #             cnt += 1
-
-        #     mask_windows = window_partition(img_mask, self.window_size)  # nW, window_size, window_size, 1
-        #     mask_windows = mask_windows.view(-1, self.window_size * self.window_size)
-        #     attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
-        #     attn_mask = attn_mask.masked_fill(attn_mask != 0, float(-100.0)).masked_fill(attn_mask == 0, float(0.0))
-        # else:
-        #     attn_mask = None
-
-        # self.register_buffer("attn_mask", attn_mask)
 
     def forward(self, x):
         # H, W = self.input_resolution
@@ -506,17 +506,13 @@ class BasicLayer(nn.Module):
         else:
             self.downsample = None
 
-    def forward(self, x, use_num=20):
-        my_i=0
+    def forward(self, x):
         for blk in self.blocks:
             if self.use_checkpoint:
                 x = checkpoint.checkpoint(blk, x)
             else:
                 x = blk(x)
                 x_ori = x
-                my_i = my_i+1
-                if my_i == use_num:
-                    break
 
         if self.downsample is not None:
             x = self.downsample(x)
@@ -722,39 +718,9 @@ class Swin(nn.Module):
                                use_checkpoint=use_checkpoint)
             self.layers.append(layer)
         
-        # build decoder layers
-        # self.layers_up = nn.ModuleList()
-        # self.concat_back_dim = nn.ModuleList()
-        # for i_layer in range(self.num_layers):
-        #     concat_linear = nn.Linear(2*int(embed_dim*2**(self.num_layers-1-i_layer)),
-        #     int(embed_dim*2**(self.num_layers-1-i_layer))) if i_layer > 0 else nn.Identity()
-        #     if i_layer ==0 :
-        #         layer_up = PatchExpand(input_resolution=(patches_resolution[0] // (2 ** (self.num_layers-1-i_layer)),
-        #         patches_resolution[1] // (2 ** (self.num_layers-1-i_layer))), dim=int(embed_dim * 2 ** (self.num_layers-1-i_layer)), dim_scale=2, norm_layer=norm_layer)
-        #     else:
-        #         layer_up = BasicLayer_up(dim=int(embed_dim * 2 ** (self.num_layers-1-i_layer)),
-        #                         input_resolution=(patches_resolution[0] // (2 ** (self.num_layers-1-i_layer)),
-        #                                             patches_resolution[1] // (2 ** (self.num_layers-1-i_layer))),
-        #                         depth=depths[(self.num_layers-1-i_layer)],
-        #                         num_heads=num_heads[(self.num_layers-1-i_layer)],
-        #                         window_size=window_size,
-        #                         mlp_ratio=self.mlp_ratio,
-        #                         qkv_bias=qkv_bias, qk_scale=qk_scale,
-        #                         drop=drop_rate, attn_drop=attn_drop_rate,
-        #                         drop_path=dpr[sum(depths[:(self.num_layers-1-i_layer)]):sum(depths[:(self.num_layers-1-i_layer) + 1])],
-        #                         norm_layer=norm_layer,
-        #                         upsample=PatchExpand if (i_layer < self.num_layers - 1) else None,
-        #                         use_checkpoint=use_checkpoint)
-        #     self.layers_up.append(layer_up)
-        #     self.concat_back_dim.append(concat_linear)
 
         self.norm = norm_layer(self.num_features)
         self.norm_up= norm_layer(self.embed_dim)
-
-        # if self.final_upsample == "expand_first":
-        #     print("---final upsample expand_first---")
-        #     self.up = FinalPatchExpand_X4(input_resolution=(img_size//patch_size,img_size//patch_size),dim_scale=4,dim=embed_dim)
-        #     self.output = nn.Conv2d(in_channels=embed_dim,out_channels=self.num_classes,kernel_size=1,bias=False)
 
         self.apply(self._init_weights)
 

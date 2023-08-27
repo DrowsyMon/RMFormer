@@ -10,12 +10,17 @@ def test_loop(args):
 
     # select which epoch_xx.pth to test
     epoch_num = [28, 29, 30, 31]
+    # epoch_num = [31]
     # select which dataset to test
-    dataset_list = ['HRSOD','UHRSD', 'HR10K'] # dataset_list = ['HRSOD','UHRSD','HR10K']
+    # dataset_list = ['HRSOD','UHRSD', 'HR10K']
+    dataset_list = ['HR10K', 'DAVIS-S', 'DUTS', 'DUT-OMRON', 'ECSSD', 'HKU-IS']
+    # dataset_list = ['DAVIS-S', 'DUTS', 'DUT-OMRON', 'ECSSD', 'HKU-IS']
+    # dataset_list = ['HR10K']
 
     model_list = []
     for tnum in epoch_num:
         model_list.append('epoch_'+str(tnum)+'.pth')
+
 
     img_list = []
     label_list = []

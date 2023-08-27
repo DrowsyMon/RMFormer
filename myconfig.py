@@ -29,19 +29,13 @@ def setting_data(data_name, parser):
         parser.add_argument('--tra_img_dir',type=str,default='HRSOD_train/',help='Location of training image')
         parser.add_argument('--tra_label_dir',type=str,default='HRSOD_train_mask/',help='train label')
         parser.add_argument('--tra_edge_dir',type=str,default='HRSOD_train_edge/',help='train label')
-        parser.add_argument('--test_img_dir',type=str,default='HRSOD_test/',help='Location of test image')
-        parser.add_argument('--test_label_dir',type=str,default='HRSOD_test_mask/',help='Location of test label')
-        parser.add_argument('--pred_results_dir',type=str,default='Results/hrsod_results/',help='pred results dir')
 
     elif data_name == 'HRS10K':
-        # HRS10K
-        parser.add_argument('--data_dir', type=str,default='./train_data/HRS10K/train/', help='Parent folder')
+        # HR10K
+        parser.add_argument('--data_dir', type=str,default='./train_data/HR10K/train/', help='Parent folder')
         parser.add_argument('--tra_img_dir',type=str,default='img_train_2560max/',help='Location of training image')
         parser.add_argument('--tra_label_dir',type=str,default='label_train_2560max/',help='train label')
         parser.add_argument('--tra_edge_dir',type=str,default='edge_train_2560max/',help='train label')
-        parser.add_argument('--test_img_dir',type=str,default='test/img_test_2560max/',help='Location of test image')
-        parser.add_argument('--test_label_dir',type=str,default='test/label_test_2560max/',help='Location of test label')
-        parser.add_argument('--pred_results_dir',type=str,default='Results/10k_results/',help='pred results dir')
 
     elif data_name == 'UH':
         # UHRSD
@@ -49,9 +43,6 @@ def setting_data(data_name, parser):
         parser.add_argument('--tra_img_dir',type=str,default='UH_train/img/',help='Location of training image')
         parser.add_argument('--tra_label_dir',type=str,default='UH_train/mask/',help='train label')
         parser.add_argument('--tra_edge_dir',type=str,default='UH_train/edge/',help='train label')
-        parser.add_argument('--test_img_dir',type=str,default='UHRSD_TE_2K/image/',help='Location of test image')
-        parser.add_argument('--test_label_dir',type=str,default='UHRSD_TE_2K/mask/',help='Location of test label')
-        parser.add_argument('--pred_results_dir',type=str,default='Results/uhrsd_results/',help='pred results dir')
 
     elif data_name == 'KUH':
         # HRS10K + UHRSD + HRSOD
@@ -59,9 +50,6 @@ def setting_data(data_name, parser):
         parser.add_argument('--tra_img_dir',type=str,default='KUH_train/img/',help='Location of training image')
         parser.add_argument('--tra_label_dir',type=str,default='KUH_train/mask/',help='train label')
         parser.add_argument('--tra_edge_dir',type=str,default='KUH_train/edge/',help='train label')
-        parser.add_argument('--test_img_dir',type=str,default='HRS10K_test/',help='Location of test image')
-        parser.add_argument('--test_label_dir',type=str,default='HRS10K_test_mask/',help='Location of test label')
-        parser.add_argument('--pred_results_dir',type=str,default='Results/10k_results/',help='pred results dir')
 
     elif data_name == 'DH':
         # DUTS + HRSOD
@@ -69,9 +57,6 @@ def setting_data(data_name, parser):
         parser.add_argument('--tra_img_dir',type=str,default='image/',help='Location of training image')
         parser.add_argument('--tra_label_dir',type=str,default='mask/',help='train label')
         parser.add_argument('--tra_edge_dir',type=str,default='edge/',help='train label')
-        parser.add_argument('--test_img_dir',type=str,default='HRS10K_test/',help='Location of test image')
-        parser.add_argument('--test_label_dir',type=str,default='HRS10K_test_mask/',help='Location of test label')
-        parser.add_argument('--pred_results_dir',type=str,default='Results/10k_results/',help='pred results dir')
 
     return parser
 
@@ -82,12 +67,13 @@ def training_param(parser):
     parser.add_argument('--train_scheduler_num',type=int,default=32,help='scheduler epochs')
     parser.add_argument('--epoch_num',type=int,default=32,help='Total epochs')
     parser.add_argument('--batchsize',type=int,default=3,help='Batchsize')
-    parser.add_argument('--itr_epoch',type=int,default=4054,help='iterations per epoch/4980-KUH/2180-UH/4054-DH/536-HRSOD/2800-HRS10K')
+    parser.add_argument('--itr_epoch',type=int,default=4980,help='iterations per epoch/4980-KUH/2180-UH/4054-DH/536-HRSOD/2800-HR10K')
 
     parser.add_argument('--resume',action='store_true', default=False,help='Resume training,False')  
     parser.add_argument('--resume_path',type=str,\
-        default='save_models/Atemp/epoch_4.pth',help='resume model path')
+        default='save_models/Atemp/epoch_23.pth',help='resume model path')
     parser.add_argument('--save_interval',type=int,default=1,help='save model every X epoch')
+
 
     return parser
 
@@ -137,8 +123,8 @@ def transformer_setting(parser):
 
 def myParser():
     my_parser = argparse.ArgumentParser()
-    data_name = 'DH'
-    exp_name = 'exptest_DH'
+    data_name = 'KUH'
+    exp_name = 'exp1'
 
     tensorboard_folder = 'runs1'
     save_path = 'save_models/Atemp/'

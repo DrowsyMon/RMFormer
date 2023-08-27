@@ -111,9 +111,9 @@ We trained model in three different training setting: DH, UH and KUH
 
 These trained models be download here: 
 
->[Baidu](https://pan.baidu.com/s/1h5hEpEdTHRpXp-QT-ys4dg) [Extracting code:iavg]
+>[Baidu](https://pan.baidu.com/s/1SjWXIALGAzG6et769mXIZQ) [Extracting code:a2r6]
 
->[Google Drive](https://drive.google.com/drive/folders/1avHY7VASvLSsqvT5saU9OBAsbx2oJ0HD?usp=sharing)
+>[Google Drive](https://drive.google.com/drive/folders/17LkT_7GHMiQ2Eqnj3aBTqUyUdVszd9x2?usp=drive_link)
 
 Change the paths in `./test.py`, then run:
 ```
@@ -124,9 +124,9 @@ python test.py
 ### Evaluation
 The saliency maps of our RMFormer can be download here:
 
->[Baidu](https://pan.baidu.com/s/1BVj_BaaFX4vz7PlbSDFqcw) [Extracting code:4h2g]
+>[Baidu](https://pan.baidu.com/s/1-b1HYIja-692cG33lygleA) [Extracting code:akhg]
 
->[Google Drive](https://drive.google.com/file/d/1MZj3Nzz3NSbTWPLSutKcgRXypTdZu_5h/view?usp=sharing)
+>[Google Drive](https://drive.google.com/drive/folders/1tqXm1qn7dgar6k8xSlmtYVEhzdWDNpaT?usp=drive_link)
 
 The code in `./eval.py` is from:
 > https://github.com/xuebinqin/Binary-Segmentation-Evaluation-Tool
@@ -142,7 +142,25 @@ We have added some modifications in our codes for generating mBA results.
 
 ---
 ---
+>Notice:
+We have reorganized the code and repeated experiments under three different training settings (DH, UH, KUH). If you need the trained models report in the paper, you can download them from the link below. 
+
+>trained models: 
+
+>[Baidu](https://pan.baidu.com/s/1h5hEpEdTHRpXp-QT-ys4dg) [Extracting code:iavg]
+
+>[Google Drive](https://drive.google.com/drive/folders/1avHY7VASvLSsqvT5saU9OBAsbx2oJ0HD?usp=sharing)
+
+>The saliency maps
+
+>[Baidu](https://pan.baidu.com/s/1BVj_BaaFX4vz7PlbSDFqcw) [Extracting code:4h2g]
+
+>[Google Drive](https://drive.google.com/file/d/1MZj3Nzz3NSbTWPLSutKcgRXypTdZu_5h/view?usp=sharing)
+
+
+---
+---
 
 If you have any problems. Please concat
 
-zhpp@dlut.edu.cn or dengxh@mail.dlut.edu.cn
+dengxh@mail.dlut.edu.cn or zhpp@dlut.edu.cn

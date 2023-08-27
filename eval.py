@@ -1,5 +1,4 @@
 import numpy as np
-from skimage import io
 import glob
 from measures import compute_MAE_F_S_cv2
 

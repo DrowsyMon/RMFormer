@@ -34,43 +34,7 @@ def compute_mae(mask1,mask2):
     return maeError
 
 
-def compute_ave_MAE_of_methods(gt_name_list,rs_dir_lists):
-#input 'gt_name_list': ground truth name list
-#input 'rs_dir_lists': to-be-evaluated mask directories (not the file names, just folder names)
-#output average Mean Absolute Error, 1xN, N is the number of folders
-#output 'gt2rs': numpy array with shape of (num_rs_dir)
 
-    num_gt = len(gt_name_list) # number of ground truth files
-    num_rs_dir = len(rs_dir_lists) # number of method folders
-    if(num_gt==0):
-        print("ERROR: The ground truth directory is empty!")
-        exit()
-
-    mae = np.zeros((num_gt,num_rs_dir)) # MAE of methods
-    gt2rs = np.zeros((num_gt,num_rs_dir)) # indicate if the mask mae of methods is correctly computed
-    for i in range(0,num_gt):
-        print('-Processed %d/%d'%(i+1,num_gt),end='\r')
-        #print("Completed {:2.0%}".format(i / num_gt), end="\r") # print percentile of processed, python 3.0 and newer version
-        gt = io.imread(gt_name_list[i]) # read ground truth
-        gt_name = gt_name_list[i].split('/')[-1] # get the file name of the ground truth
-        for j in range(0,num_rs_dir):
-            tmp_mae = 0.0
-            try:
-                rs = io.imread(rs_dir_lists[j]+gt_name) # read the corresponding mask of each method
-            except IOError:
-                #print('ERROR: Couldn\'t find the following file:',rs_dir_lists[j]+gt_name)
-                continue
-            try:
-                tmp_mae = compute_mae(gt,rs) # compute the mae
-            except IOError:
-                #print('ERROR: Fails in compute_mae!')
-                continue
-            mae[i][j] = tmp_mae
-            gt2rs[i][j] = 1.0
-    mae_col_sum = np.sum(mae,0) # compute the sum of MAE of each method
-    gt2rs = np.sum(gt2rs,0) # compute the number of correctly computed MAE of each method
-    ave_maes = mae_col_sum/(gt2rs+1e-8) # compute the average MAE of each method
-    return ave_maes, gt2rs
 
 
 def compute_pre_rec(gt,mask,mybins=np.arange(0,256)):
@@ -108,135 +72,9 @@ def compute_pre_rec(gt,mask,mybins=np.arange(0,256)):
     return np.reshape(precision,(len(precision))),np.reshape(recall,(len(recall)))
 
 
-def compute_PRE_REC_FM_of_methods(gt_name_list,rs_dir_lists,beta=0.3):
-#input 'gt_name_list': ground truth name list
-#input 'rs_dir_lists': to-be-evaluated mask directories (not the file names, just folder names)
-#output precision 'PRE': numpy array with shape of (num_rs_dir, 256)
-#       recall    'REC': numpy array with shape of (num_rs_dir, 256)
-#       F-measure (beta) 'FM': numpy array with shape of (num_rs_dir, 256)
-
-    mybins = np.arange(0,256) # different thresholds to achieve binarized masks for pre, rec, Fm measures
-
-    num_gt = len(gt_name_list) # number of ground truth files
-    num_rs_dir = len(rs_dir_lists) # number of method folders
-    if(num_gt==0):
-        #print("ERROR: The ground truth directory is empty!")
-        exit()
-
-    PRE = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # PRE: with shape of (num_gt, num_rs_dir, 256)
-    REC = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # REC: the same shape with PRE
-    # FM = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # Fm: the same shape with PRE
-    gt2rs = np.zeros((num_gt,num_rs_dir)) # indicate if the mask of methods is correctly computed
-
-    for i in range(0,num_gt):
-        print('>>Processed %d/%d'%(i+1,num_gt),end='\r')
-        gt = io.imread(gt_name_list[i]) # read ground truth
-        gt = mask_normalize(gt)*255.0 # convert gt to [0,255]
-        gt_name = gt_name_list[i].split('/')[-1] # get the file name of the ground truth "xxx.png"
-
-        for j in range(0,num_rs_dir):
-            pre, rec, f = np.zeros(len(mybins)), np.zeros(len(mybins)), np.zeros(len(mybins)) # pre, rec, f or one mask w.r.t different thresholds
-            try:
-                rs = io.imread(rs_dir_lists[j]+gt_name) # read the corresponding mask from each method
-                rs = mask_normalize(rs)*255.0 # convert rs to [0,255]
-            except IOError:
-                #print('ERROR: Couldn\'t find the following file:',rs_dir_lists[j]+gt_name)
-                continue
-            try:
-                pre, rec = compute_pre_rec(gt,rs,mybins=np.arange(0,256))
-            except IOError:
-                #print('ERROR: Fails in compute_mae!')
-                continue
-
-            PRE[i,j,:] = pre
-            REC[i,j,:] = rec
-            gt2rs[i,j] = 1.0
-    print('\n')
-    gt2rs = np.sum(gt2rs,0) # num_rs_dir
-    gt2rs = np.repeat(gt2rs[:, np.newaxis], 255, axis=1) #num_rs_dirx255
-
-    PRE = np.sum(PRE,0)/(gt2rs+1e-8) # num_rs_dirx255, average PRE over the whole dataset at every threshold
-    REC = np.sum(REC,0)/(gt2rs+1e-8) # num_rs_dirx255
-    FM = (1+beta)*PRE*REC/(beta*PRE+REC+1e-8) # num_rs_dirx255
-
-    return PRE, REC, FM, gt2rs
 
 
-def compute_MAE_F_S(gt_name_list,rs_dir_lists,beta=0.3):
-    mybins = np.arange(0,256) # different thresholds to achieve binarized masks for pre, rec, Fm measures
 
-    num_gt = len(gt_name_list) # number of ground truth files
-    num_rs_dir = len(rs_dir_lists) # number of method folders
-    if(num_gt==0):
-        print("ERROR: The ground truth directory is empty!")
-        exit()
-
-    mae = np.zeros((num_gt,num_rs_dir)) # MAE of methods
-    PRE = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # PRE: with shape of (num_gt, num_rs_dir, 256)
-    REC = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # REC: the same shape with PRE
-    # FM = np.zeros((num_gt,num_rs_dir,len(mybins)-1)) # Fm: the same shape with PRE
-    gt2rs = np.zeros((num_gt,num_rs_dir)) # indicate if the mask of methods is correctly computed
-    badlist = []
-
-    for i in range(0,num_gt):
-        print('>>Processed %d/%d'%(i+1,num_gt),end='\r')
-        try:
-            gt = io.imread(gt_name_list[i])
-        except ValueError:
-            print(gt_name_list[i])
-            continue
-        # gt = io.imread(gt_name_list[i]) # read ground truth
-        gt = mask_normalize(gt)*255.0 # convert gt to [0,255]
-        gt_name = gt_name_list[i].split('/')[-1] # get the file name of the ground truth "xxx.png"
-
-        for j in range(0,num_rs_dir):
-            tmp_mae = 0.0
-            pre, rec, f = np.zeros(len(mybins)), np.zeros(len(mybins)), np.zeros(len(mybins)) # pre, rec, f or one mask w.r.t different thresholds
-            try:
-                rs = io.imread(rs_dir_lists[j]+gt_name) # read the corresponding mask from each method
-                rs = mask_normalize(rs)*255.0 # convert rs to [0,255]
-            except ValueError:
-                #print('ERROR: Couldn\'t find the following file:',rs_dir_lists[j]+gt_name)
-                print(rs_dir_lists[j]+gt_name)
-                continue
-            try:
-                tmp_mae = compute_mae(gt,rs)
-                pre, rec = compute_pre_rec(gt,rs,mybins=np.arange(0,256))
-            except IOError:
-                #print('ERROR: Fails in compute_mae!')
-                continue
-
-            mae[i][j] = tmp_mae
-            PRE[i,j,:] = pre
-            REC[i,j,:] = rec
-            gt2rs[i,j] = 1.0
-
-            # bestl = np.where(pre>rec)[0]
-            # if len(bestl) == 0:
-            #     badlist.append(rs_dir_lists[j]+gt_name)
-            # else:
-            #     best_pr_loc = bestl[-1]
-            #     if pre[best_pr_loc] < 0.65:
-            #         badlist.append(rs_dir_lists[j]+gt_name)
-            #     else:
-            #         continue
-            if tmp_mae > 0.30:
-                badlist.append(rs_dir_lists[j]+gt_name)
-
-
-    print('\n')
-
-    mae_col_sum = np.sum(mae,0) # compute the sum of MAE of each method
-    gt2rs = np.sum(gt2rs,0) # num_rs_dir
-    ave_maes = mae_col_sum/(gt2rs+1e-8) # compute the average MAE of each method
-
-    gt2rs = np.repeat(gt2rs[:, np.newaxis], 255, axis=1) #num_rs_dirx255
-
-    PRE2 = np.sum(PRE,0)/(gt2rs+1e-8) # num_rs_dirx255, average PRE over the whole dataset at every threshold
-    REC2 = np.sum(REC,0)/(gt2rs+1e-8) # num_rs_dirx255
-    FM = (1+beta)*PRE2*REC2/(beta*PRE2+REC2+1e-8) # num_rs_dirx255
-
-    return PRE2, REC2, FM, gt2rs,ave_maes, PRE, REC, badlist
 
 def get_disk_kernel(radius):
     return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (radius*2+1, radius*2+1))
@@ -338,21 +176,6 @@ def compute_MAE_F_S_cv2(gt_name_list,rs_dir_lists,beta=0.3):
 
             if tmp_mae >0.20:
                 badlist.append(rs_dir_lists[j]+gt_name)
-            
-            
-            # bestl = np.where(pre>rec)[0]
-
-
-
-            # if len(bestl) == 0:
-            #     badlist.append(rs_dir_lists[j]+gt_name)
-            # else:
-            #     best_pr_loc = bestl[-1]
-            #     if pre[best_pr_loc] < 0.65:
-            #         badlist.append(rs_dir_lists[j]+gt_name)
-            #     else:
-            #         continue
-
 
     print('\n')
 

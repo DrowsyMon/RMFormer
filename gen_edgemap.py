@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     # change to your own dir
 
-    mask_dir = 'train_data/MIX-KUH/KUH_train/mask/'
-    edge_dir = 'train_data/MIX-KUH/KUH_train/edge/'
+    mask_dir = 'train_data/MIX-KUH/mask/'
+    edge_dir = 'train_data/MIX-KUH/edge/'
 
     edge_map_generate(mask_dir, edge_dir)
 

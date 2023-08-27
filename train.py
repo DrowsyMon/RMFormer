@@ -8,13 +8,11 @@ from tensorboardX import SummaryWriter
 import glob
 import tqdm
 import os
-from dataloader_collect import RandomFlip,RandomCrop,ToTensorLab,SalObjDataset,RescaleT
+from dataloader_collect import RandomFlip,RandomCrop,ToTensor,SalObjDataset,RescaleT
 from model import myNet1, LR_Scheduler
 from losses.lossfunc import loss_vit_simple_edgelist
 from model.helper.helper_blocks import setup_seed 
 from myconfig import myParser
-# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 setup_seed(1234)
 
 args = myParser()
@@ -24,10 +22,6 @@ args = myParser()
 train_img_dir = args.data_dir + args.tra_img_dir
 train_label_dir = args.data_dir + args.tra_label_dir
 train_edge_dir = args.data_dir + args.tra_edge_dir
-test_img_dir = args.data_dir+args.test_img_dir
-test_label_dir = args.data_dir+args.test_label_dir
-pred_dir = args.data_dir+args.pred_results_dir
-
 
 image_ext = '.jpg'
 label_ext = '.png'
@@ -57,11 +51,11 @@ salobj_dataset = SalObjDataset(
         RescaleT(1600),
         RandomCrop(1536),
         RandomFlip(0.5),
-        ToTensorLab(flag=0)]))
+        ToTensor()]))
 salobj_dataloader = DataLoader( salobj_dataset, 
                                 batch_size=args.batchsize, \
                                 shuffle=True, 
-                                num_workers=16,
+                                num_workers=8,
                                 pin_memory=True,
                                 drop_last=True)
 
@@ -176,7 +170,7 @@ for epoch in range(start_epoch, args.epoch_num):
         #########################################
         #########################################
         dout,dout_c, dmid_list,de_list, attn_out = net(inputs_v)
-        lossp, loss_all, bceloss, ssimloss, iouloss,loss_e = \
+        lossp, loss_all = \
             loss_vit_simple_edgelist(dout,dout_c, dmid_list,de_list,attn_out,\
             edge_v, labels_v)
 
@@ -199,32 +193,23 @@ for epoch in range(start_epoch, args.epoch_num):
         #########################################
         # print statistics
         running_loss += loss_all.item()
-        running_tar_loss += lossp.item()
-        running_edge_loss += loss_e.item()
 
 # ------- tensorboard --------
         # tensorboard
         trloss = (running_loss / ite_num4val)
-        trloss2 = (running_tar_loss / ite_num4val)
-        trlosse = (running_edge_loss / ite_num4val)
 
         writer.add_scalar('loss/total',trloss, ((i+1)+epoch*args.itr_epoch) )
-        writer.add_scalar('loss/P_loss',trloss2, ((i+1)+epoch*args.itr_epoch))
-        writer.add_scalar('loss/E_loss',trlosse, ((i+1)+epoch*args.itr_epoch))
-        
-        writer.add_scalar('3_type/BEC',bceloss.item(), ((i+1)+epoch*args.itr_epoch))
-        writer.add_scalar('3_type/IOUloss',iouloss.item(), ((i+1)+epoch*args.itr_epoch))
 
         if ((ite_num % (args.itr_epoch*args.save_interval))==0)|(ite_num == args.itr_epoch):
-        # if (ite_num == 10):  
+
             checkpoint = {
                 "net": net.state_dict(),
                 'optimizer':optimizer.state_dict(),
                 "epoch": epoch
             }
             save_dir = args.model_dir + "epoch_%d.pth" % (epoch)
-            torch.save(checkpoint,save_dir)       
-          
+            torch.save(checkpoint,save_dir)
+
             running_loss = 0.0
             running_tar_loss = 0.0
             running_edge_loss = 0.0
@@ -245,5 +230,4 @@ for epoch in range(start_epoch, args.epoch_num):
             writer.add_image('Output/d2', utils.make_grid(torch.sigmoid(dout_c),nrow=2), global_step = GG)
 
             GG += 1
-        del dout, loss_all,\
-            bceloss, ssimloss, iouloss
+        del dout, loss_all

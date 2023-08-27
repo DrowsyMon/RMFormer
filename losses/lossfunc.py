@@ -16,8 +16,6 @@ def bce_iou_loss(pred,target):
 
     return loss
 def bce_iou_loss_logit(pred, mask):
-    # size = pred.size()[2:]
-    # mask = F.interpolate(mask,size=size, mode='bilinear')
     wbce = F.binary_cross_entropy_with_logits(pred, mask)
     pred = torch.sigmoid(pred)
     inter = (pred * mask).sum(dim=(2, 3))
@@ -77,9 +75,5 @@ def loss_vit_simple_edgelist(dout,dout_c,dmid_list,de_list, sideouts,\
 
 
     loss =  lossp + loss_c + (total_temp_pred_loss)*1 + total_temp_edge_loss + total_new_pred_loss
-    bceloss = loss_c 
-    ssimloss = loss_c
-    iouloss = loss_c 
-    loss_e = (loss_c)
 
-    return loss_c, loss, bceloss, ssimloss, iouloss, loss_e
+    return loss_c, loss
