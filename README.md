@@ -88,9 +88,13 @@ python gen_edgemap.py
 ### Train
 
 
-Download Swin pretrain model, save them in `./save_models/pretrain`:
+Download Swin pretrain model, save them in `./save_models/pretrain`
 
->[Swin-B-224](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin]
+The link below is from https://github.com/microsoft/Swin-Transformer
+
+>[Baidu](https://pan.baidu.com/s/1vwJxnJcVqcLZAw9HaqiR6g) [Extracting code:swin]
+
+>[github](https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window12_384_22k.pth)
 
 Change the dataset directory, training setting in `./myconfig.py`
 
@@ -137,13 +141,15 @@ We also use the evalutation below to generate results in our paper:
 > https://github.com/Jun-Pu/Evaluation-on-salient-object-detection
 
 
-We have added some modifications in our codes for generating mBA results.
+Some modifications are made in our codes for generating mBA results.
+
+You can refer to codes in `./evaluation_code.zip`
 
 
 ---
 ---
 >Notice:
-We have reorganized the code and repeated experiments under three different training settings (DH, UH, KUH). If you need the trained models report in the paper, you can download them from the link below. 
+We have reorganized the code and get better performance with adjusted parameter initialization before training. If you need the trained models report in the paper, you can download them from the link below. 
 
 >trained models: 
 
