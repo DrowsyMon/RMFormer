@@ -115,9 +115,27 @@ We trained model in three different training setting: DH, UH and KUH
 
 These trained models be download here: 
 
->[Baidu](https://pan.baidu.com/s/1SjWXIALGAzG6et769mXIZQ) [Extracting code:a2r6]
+>[Baidu](https://pan.baidu.com/s/1h5hEpEdTHRpXp-QT-ys4dg) [Extracting code:iavg]
+>[Google Drive](https://drive.google.com/drive/folders/1avHY7VASvLSsqvT5saU9OBAsbx2oJ0HD?usp=sharing)
 
+The saliency maps of our RMFormer can be download here:
+
+>[Baidu](https://pan.baidu.com/s/1BVj_BaaFX4vz7PlbSDFqcw) [Extracting code:4h2g]
+>[Google Drive](https://drive.google.com/file/d/1MZj3Nzz3NSbTWPLSutKcgRXypTdZu_5h/view?usp=sharing)
+
+
+
+Notice:
+We have reorganized the code and achieved enhanced performance by adjusting the parameter initialization before training. If you would like to access the improved models, please download them from the provided link below.
+
+
+>Trained models:
+>[Baidu](https://pan.baidu.com/s/1SjWXIALGAzG6et769mXIZQ) [Extracting code:a2r6]
 >[Google Drive](https://drive.google.com/drive/folders/17LkT_7GHMiQ2Eqnj3aBTqUyUdVszd9x2?usp=drive_link)
+
+>Saliency maps:
+>[Baidu](https://pan.baidu.com/s/1-b1HYIja-692cG33lygleA) [Extracting code:akhg]
+>[Google Drive](https://drive.google.com/drive/folders/1tqXm1qn7dgar6k8xSlmtYVEhzdWDNpaT?usp=drive_link)
 
 Change the paths in `./test.py`, then run:
 ```
@@ -126,11 +144,7 @@ python test.py
 * After testing, saliency maps will be saved in the `'prediction_dir'`
 
 ### Evaluation
-The saliency maps of our RMFormer can be download here:
 
->[Baidu](https://pan.baidu.com/s/1-b1HYIja-692cG33lygleA) [Extracting code:akhg]
-
->[Google Drive](https://drive.google.com/drive/folders/1tqXm1qn7dgar6k8xSlmtYVEhzdWDNpaT?usp=drive_link)
 
 The code in `./eval.py` is from:
 > https://github.com/xuebinqin/Binary-Segmentation-Evaluation-Tool
@@ -144,23 +158,6 @@ We also use the evalutation below to generate results in our paper:
 Some modifications are made in our codes for generating mBA results.
 
 You can refer to codes in `./evaluation_code.zip`
-
-
----
----
->Notice:
-We have reorganized the code and get better performance with adjusted parameter initialization before training. If you need the trained models report in the paper, you can download them from the link below. 
-
->trained models: 
-
->[Baidu](https://pan.baidu.com/s/1h5hEpEdTHRpXp-QT-ys4dg) [Extracting code:iavg]
->[Google Drive](https://drive.google.com/drive/folders/1avHY7VASvLSsqvT5saU9OBAsbx2oJ0HD?usp=sharing)
-
->The saliency maps
-
->[Baidu](https://pan.baidu.com/s/1BVj_BaaFX4vz7PlbSDFqcw) [Extracting code:4h2g]
->[Google Drive](https://drive.google.com/file/d/1MZj3Nzz3NSbTWPLSutKcgRXypTdZu_5h/view?usp=sharing)
-
 
 ---
 ---
