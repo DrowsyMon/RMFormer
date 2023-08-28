@@ -78,6 +78,7 @@ The directory should be like this:
    |   |-- image
    ...
 ````
+---
 
 ### Edge Map Generate
 Modify the dir in `./gen_edgemap.py`, then run:
@@ -109,6 +110,7 @@ bash train.sh
 * After training, models will be saved in `./save_models/Atemp`
 * Tensorboard log files are in `./runs1`
 
+---
 
 ### Interference
 We trained model in three different training setting: DH, UH and KUH 
@@ -142,6 +144,8 @@ Change the paths in `./test.py`, then run:
 python test.py
 ```
 * After testing, saliency maps will be saved in the `'prediction_dir'`
+
+---
 
 ### Evaluation
 
