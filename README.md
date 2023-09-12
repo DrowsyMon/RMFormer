@@ -22,7 +22,7 @@ Download Link:
 
 ## Usage
 ### Conda Enviorment
-* PyTorch 1.21.1
+* PyTorch 1.12.1
 * python 3.8
 * cudatoolkit 11.6
 * OpenCV
