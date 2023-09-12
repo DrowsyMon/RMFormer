@@ -557,6 +557,14 @@ class My_Attn_Cross(nn.Module):
     def forward(self, qin, kin, vin, shortcut=None):
         x = self.attn(query = qin, key = kin, value = vin)[0]
 
+        # If nn.MultiheadAttention has no batch_first keyword, try to upgrade PyTorch>= 1.9.0 or use codes below:
+
+        # qin = qin.transpose(1,0)
+        # kin = kin.transpose(1,0)
+        # vin = vin.transpose(1,0)
+        # x = self.attn(query = qin, key = kin, value = vin)[0]
+        # x = x.transpose(1,0)
+
         if shortcut is not None:
             pre_conv_hr = shortcut + self.proj_drop(self.norm1(self.mlp(x)))
         else:
